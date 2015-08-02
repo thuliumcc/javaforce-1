@@ -29,7 +29,7 @@
 
 <p>JavaForce is a Java library extending the capabilities of Java.</p>
 
-<p>The main library includes a VoIP stack and bindings for FFMPEG, OpenGL, etc.</p>
+<p>The main library includes a VoIP stack and bindings for FFMPEG, OpenGL and Camera.</p>
 
 <p>Includes many apps built around the library such as jPhoneLite, jfVideo Createor, jfAudio, jfMusic, etc.</p>
 
@@ -40,32 +40,21 @@
 <h1>
 <a id="projects" class="anchor" href="#projects" aria-hidden="true"><span class="octicon octicon-link"></span></a>Projects</h1>
 
-<p>jPhoneLite - Java VoIP/SIP soft phone
-  6 lines, g711, g729a, Xfer, Hold, Conference, contact list, recent list, RFC 2833, etc.</p>
+<p>jPhoneLite - Java VoIP soft phone</p>
 
 <p>jfVideo Creator - video production</p>
 
-<p>jfPaint - a multi-tabbed image editor</p>
+<p>jfPaint - multi-tabbed image editor</p>
 
-<p>jPBXlite - Java VoIP/SIP PBX</p>
+<p>jPBXlite - Java VoIP PBX</p>
 
-<ul>
-<li>extensions, trunks, voicemail, IVRs, conferences</li>
-</ul>
+<p>jfBroadcast - VoIP Auto Dialer System</p>
 
-<p>jfBroadcast - VoIP/SIP Auto Dialer System</p>
+<p>jfTerm - Telnet client application that includes support for:</p>
 
-<p>jfTerm - a great Telnet client application that includes support for:
-  Telnet/ANSI (full color).
-  SSH (X11) (using JCraft JSch)
-  SSL
-  Multi-tabbed.
-  Copy/Paste.
-  Logging.</p>
+<p>jfEdit - multi-tabbed text editor.</p>
 
-<p>jfEdit - a multi-tabbed text editor.</p>
-
-<p>jfHex - a multi-tabbed hex editor.</p>
+<p>jfHex - multi-tabbed hex editor.</p>
 
 <p>and many more...</p>
 
@@ -75,20 +64,17 @@
 <p>/          - main folder (run ant here to build /src)
  /src       - the javaforce source files
  /jars      - 3rd party files
+ /stubs     - native launcher stubs
+ /native    - native JNI bindings for FFMPEG, OpenGL, Camera
  /classes   - javaforce compiled files
  /projects  - source for all sub-projects</p>
 
 <h1>
-<a id="classpath" class="anchor" href="#classpath" aria-hidden="true"><span class="octicon octicon-link"></span></a>Classpath</h1>
-
-<p>No special CLASSPATH is required except maybe "." to run applications of course.</p>
-
-<h1>
 <a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h1>
 
-<p>All projects are built with Apache Ant (available at <a href="http://ant.apache.org">http://ant.apache.org</a>).
+<p>All projects are built with Apache Ant (<a href="http://ant.apache.org">http://ant.apache.org</a>).
 Make sure to run ant in the main folder to build the /src folder and then in any of the apps in /projects.
-If building on Windows make sure to copy /native/*.dll to /windwos/system32 since some of the
+If building on Windows make sure to copy /native/*.dll to /windows/system32 since some of the
 build tools require them.</p>
 
 <h2>
@@ -97,7 +83,7 @@ build tools require them.</p>
 <p>compile : compile projects java files
 jar : build the projects main jar file
 depjars : copy dependant jar files into project folder
-install : install files into proper folders (Linux only : "sudo ant install")
+install : install files into proper folders (Linux only) (requires root access : "sudo ant install")
 deb : build Ubuntu deb file (after install)
 rpm : build Fedora rpm file (after install)
 msi32 : build Windows msi file (32bit)
@@ -107,16 +93,11 @@ genisodmg : build Mac dmg file (cygwin/linux/mac) (uncompressed)
 javadoc : create javadoc api help files (open ./javadoc/index.html)</p>
 
 <h1>
-<a id="3rd-party" class="anchor" href="#3rd-party" aria-hidden="true"><span class="octicon octicon-link"></span></a>3rd party</h1>
-
-<p>All third party dependancies are in /jars</p>
-
-<h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
 
 <p>JavaForce itself is licensed under the LGPL license which can be read in license.txt.
 The MSI installers show the Common Public License 1.0 which is acceptable as well.
-The other jars in /jars may each have their own licensing.
+The other jars in /jars each have their own licensing.
   filters.jar - Apache License 2.0 (<a href="http://www.jhlabs.com">http://www.jhlabs.com</a>)
   bouncycastle.jar - MIT license? (<a href="http://www.bouncycastle.org">http://www.bouncycastle.org</a>)
   derby.jar - Apache License 2.0 (<a href="http://db.apache.com/derby">http://db.apache.com/derby</a>)
@@ -129,11 +110,13 @@ The other jars in /jars may each have their own licensing.
 <p>Peter Quiring
 <a href="mailto:pquiring@gmail.com">pquiring@gmail.com</a></p>
 
-<p><a href="http://javaforce.sourceforge.net">http://javaforce.sourceforge.net</a></p>
+<p>Web : <a href="http://javaforce.sourceforge.net">http://javaforce.sourceforge.net</a></p>
+
+<p>Git : github.com/pquiring/javaforce</p>
 
 <p>Version 9.6.0</p>
 
-<p>Released : July 28 2015</p>
+<p>Released : July 31 2015</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/pquiring/javaforce">Javaforce</a> is maintained by <a href="https://github.com/pquiring">pquiring</a>.</span>
