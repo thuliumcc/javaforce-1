@@ -1,131 +1,67 @@
-<!DOCTYPE html>
-<html lang="en-us">
+<html>
   <head>
-    <meta charset="UTF-8">
-    <title>Javaforce by pquiring</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel=stylesheet href="style.css" type="text/css">
+    <title>JavaForce</title>
   </head>
   <body>
-    <section class="page-header">
-      <h1 class="project-name">Javaforce</h1>
-      <h2 class="project-tagline">JavaForce Library</h2>
-      <a href="https://github.com/pquiring/javaforce" class="btn">View on GitHub</a>
-      <a href="https://github.com/pquiring/javaforce/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/pquiring/javaforce/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
 
-    <section class="main-content">
-      <h1>
-<a id="javaforce-sdk" class="anchor" href="#javaforce-sdk" aria-hidden="true"><span class="octicon octicon-link"></span></a>JavaForce SDK</h1>
+  <div class=title>
+    <div class=title_content_center>JavaForce</div>
+  </div>
+  <div class=content>
 
-<p>Version 9.6.0</p>
+<center>
 
-<h1>
-<a id="what-is-it" class="anchor" href="#what-is-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is it?</h1>
+JavaForce (JF) is a Java library extending the capabilities of Java.<br>
+It includes a VoIP stack and bindings for FFMPEG, OpenGL, Camera, etc.<br>
+<br>
+<br>
+JF includes the following apps :
+<a href="http://jphonelite.sf.net">jPhoneLite</a> (VoIP SIP SoftPhone) ,
+<a href="http://jpbxlite.sf.net">jPBXLite</a> (VoIP SIP PBX) ,
+<a href="http://jfbroadcast.sf.net" title="evil - stay away">jfBroadcast</a> (VoIP SIP AutoDialer) ,
+<a href="http://jfterm.sf.net">Telnet</a> client ,
+<a href="http://jfftp.sf.net">FTP</a> Client ,
+<a href="http://jftorrent.sf.net">Torrent</a> client/tracker/maker ,
+<a href="http://jfpasswords.sf.net">Passwords Manager</a> ,
+<a href="http://jfpaint.sf.net">Paint</a> ,
+<a href="http://jfvideo.sf.net">Video Creator</a> ,
+<a href="http://jfaudio.sf.net">Audio Editor</a> ,
+<a href="http://jfmusic.sf.net">Music Editor</a> ,
+<a href="http://jfmedia.sf.net">Media Player</a> ,
+<a href="http://jfrecorddesktop.sf.net">Record Desktop</a> ,
+<a href="http://jfrecordcamera.sf.net">Record Camera</a> ,
+<a href="http://jfproxy.sf.net">Proxy Server</a> ,
+<a href="http://jfdns.sf.net">DNS Server</a> ,
+<a href="http://jfdhcp.sf.net">DHCP Server</a> ,
+<a href="http://jfstun.sf.net">STUN/TURN Server</a> ,
+<a href="http://jfedit.sf.net">Text Editor</a> ,
+<a href="http://jfnettools.sf.net">Network Tools</a> ,
+<a href="http://jfrdp.sf.net">Remote Desktop(RDP)</a> ,
+and many more...<br>
 
-<p>JavaForce is a Java library extending the capabilities of Java.</p>
+<br><br>
 
-<p>The main library includes a VoIP stack and bindings for FFMPEG, OpenGL and Camera.</p>
+<a href="http://sourceforge.net/projects/javaforce">Project Page</a>
+ <img valign="center" src="/img/vr.gif" width=2 height=12>
+<a href="http://sourceforge.net/projects/javaforce/files">Download</a>
+ <img valign="center" src="/img/vr.gif" width=2 height=12>
+<a href="whatsnew.txt">ChangeLog</a>
+ <img valign="center" src="/img/vr.gif" width=2 height=12>
+<a href="http://github.com/pquiring/javaforce">GitHub</a>
 
-<p>Includes many apps built around the library such as jPhoneLite, jfVideo Createor, jfAudio, jfMusic, etc.</p>
+<br><br>
 
-<p>JF is also the core library in the Java infused Linux Operating system : <a href="http://jfLinux.sourceforge.net">http://jfLinux.sourceforge.net</a></p>
+JavaForce is used to create : <a href="http://jfcraft.sf.net">JFCraft</a> (a Minecraft clone).<br>
 
-<p>JF is also used to create jfCraft, a Minecraft clone : <a href="http://jfcraft.sourceforge.net">http://jfcraft.sourceforge.net</a></p>
+<br>
 
-<h1>
-<a id="projects" class="anchor" href="#projects" aria-hidden="true"><span class="octicon octicon-link"></span></a>Projects</h1>
+JF is the core library in the Java infused Linux Operating system <a href="http://jfLinux.sf.net">jfLinux.sf.net</a><br>
 
-<p>jPhoneLite - Java VoIP soft phone</p>
+<br>
 
-<p>jfVideo Creator - video production</p>
+</center>
 
-<p>jfPaint - multi-tabbed image editor</p>
-
-<p>jPBXlite - Java VoIP PBX</p>
-
-<p>jfBroadcast - VoIP Auto Dialer System</p>
-
-<p>jfTerm - Telnet client application that includes support for:</p>
-
-<p>jfEdit - multi-tabbed text editor.</p>
-
-<p>jfHex - multi-tabbed hex editor.</p>
-
-<p>and many more...</p>
-
-<h1>
-<a id="folders" class="anchor" href="#folders" aria-hidden="true"><span class="octicon octicon-link"></span></a>Folders</h1>
-
-<p>/          - main folder (run ant here to build /src)<br>
- /src       - the javaforce source files<br>
- /jars      - 3rd party files<br>
- /stubs     - native launcher stubs<br>
- /native    - native JNI bindings for FFMPEG, OpenGL, Camera<br>
- /classes   - javaforce compiled files<br>
- /projects  - source for all sub-projects  </p>
-
-<h1>
-<a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h1>
-
-<p>All projects are built with Apache Ant (<a href="http://ant.apache.org">http://ant.apache.org</a>).
-Make sure to run ant in the main folder to build the /src folder and then in any of the apps in /projects.
-If building on Windows make sure to copy /native/*.dll to /windows/system32 since some of the
-build tools require them.</p>
-
-<h2>
-<a id="common-ant-tasks" class="anchor" href="#common-ant-tasks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Common Ant tasks:</h2>
-
-<p>compile : compile projects java files
-jar : build the projects main jar file
-depjars : copy dependant jar files into project folder
-install : install files into proper folders (Linux only) (requires root access : "sudo ant install")
-deb : build Ubuntu deb file (after install)
-rpm : build Fedora rpm file (after install)
-msi32 : build Windows msi file (32bit)
-msi64 : build Windows msi file (64bit)
-dmg : build Mac dmg file (mac only)
-genisodmg : build Mac dmg file (cygwin/linux/mac) (uncompressed)
-javadoc : create javadoc api help files (open ./javadoc/index.html)</p>
-
-<h1>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
-
-<p>JavaForce itself is licensed under the LGPL license which can be read in license.txt.
-The MSI installers show the Common Public License 1.0 which is acceptable as well.
-The other jars in /jars each have their own licensing.
-  filters.jar - Apache License 2.0 (<a href="http://www.jhlabs.com">http://www.jhlabs.com</a>)
-  bouncycastle.jar - MIT license? (<a href="http://www.bouncycastle.org">http://www.bouncycastle.org</a>)
-  derby.jar - Apache License 2.0 (<a href="http://db.apache.com/derby">http://db.apache.com/derby</a>)
-  jcifs.jar - LGPL (<a href="http://jcifs.samba.org">http://jcifs.samba.org</a>)
-  jsp-api.jar &amp; servlet-api.jar - Apache License 2.0 (<a href="http://tomcat.apache.com">http://tomcat.apache.com</a>)
-  jsch.jar &amp; jzlib.jar - BSD license (<a href="http://www.jcraft.com">http://www.jcraft.com</a>)</p>
-
-<p>Enjoy!</p>
-
-<p>Peter Quiring
-<a href="mailto:pquiring@gmail.com">pquiring@gmail.com</a></p>
-
-<p>Web : <a href="http://javaforce.sourceforge.net">http://javaforce.sourceforge.net</a></p>
-
-<p>Git : github.com/pquiring/javaforce</p>
-
-<p>Version 9.6.0</p>
-
-<p>Released : July 31 2015</p>
-
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/pquiring/javaforce">Javaforce</a> is maintained by <a href="https://github.com/pquiring">pquiring</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
-
-    </section>
-
-  
+<!--  </div>  -->
   </body>
 </html>
