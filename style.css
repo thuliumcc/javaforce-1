@@ -33,17 +33,16 @@ table {
   position: relative;
   background: #88ff88;
   padding: 10px;
-  border-top: 20px;
-  border-bottom: 0px;
-  border-left: 20px;
-  border-right: 20px;
-  border-style: solid;
-  border-color: white;
+  margin-top: 20px;
+  margin-bottom: 0px;
+  margin-left: 20px;
+  margin-right: 20px;
   text-align: center;
   font-weight: bold;
   vertical-align: bottom;
   height: 16px;
   font-size: 10pt;
+  border-radius: 25px;
 }
 
 .title_content_center {
@@ -85,7 +84,7 @@ table {
 }
 
 .content {
-  background: #eeffee;
+  background: #ddffdd;
   margin-top: 0px;
   margin-bottom: 0px;
   margin-left: 20px;
