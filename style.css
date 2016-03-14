@@ -21,6 +21,7 @@ form.thin {
 
 table {
   border-collapse: collapse;
+  width: 33%;
 }
 
 .relative {
