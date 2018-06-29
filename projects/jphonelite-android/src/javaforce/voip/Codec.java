@@ -18,4 +18,21 @@ public class Codec {
   public boolean equals(Codec other) {
     return name.equals(other.name);
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Codec codec = (Codec) o;
+
+    return id == codec.id && name.equals(codec.name);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name.hashCode();
+    result = 31 * result + id;
+    return result;
+  }
 }

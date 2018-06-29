@@ -367,7 +367,8 @@ public class ShellProcess {
 
   public boolean isAlive() {
     if (p == null) return false;
-    return p.isAlive();
+    // TODO: return p.isAlive(); does not work in Java 7
+    return false;
   }
 
   public Process getProcess() {

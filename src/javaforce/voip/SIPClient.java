@@ -2,6 +2,8 @@ package javaforce.voip;
 
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import javaforce.*;
 
 /**
@@ -492,7 +494,7 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
     req.append("Call-ID: " + cd.callid + "\r\n");
     req.append("Cseq: " + cdsd.cseq + " " + cmd + "\r\n");
     req.append("Allow: INVITE, ACK, CANCEL, BYE, REFER, NOTIFY, OPTIONS\r\n");
-    req.append("User-Agent: JavaForce\r\n");
+    req.append("User-Agent: " + useragent + "\r\n");
     if ((cd.sdp != null) && (sdp)) {
       req.append("Content-Type: application/sdp\r\n");
       req.append("Content-Length: " + cd.sdp.length() + "\r\n\r\n");
@@ -705,6 +707,7 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
    */
   public void packet(String msg[], String remoteip, int remoteport) {
     try {
+      JFLog.log(String.format("%nReceived from: %s:%d%n<-----<%n%s%n------", remoteip, remoteport, Arrays.stream(msg).collect(Collectors.joining("\r\n"))));
       if (!remoteip.equals(this.remoteip) || remoteport != this.remoteport) {
         JFLog.log("Ignoring packet from unknown host:" + remoteip + ":" + remoteport);
         return;
@@ -717,6 +720,7 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
         return;
       }
       CallDetails cd = getCallDetails(callid);
+      String[] previousTo = cd.dst.to;
       if (remoteip.equals("127.0.0.1")) {
         remoteip = cd.localhost;
       }
@@ -799,79 +803,10 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
       }
       switch (type) {
         case -1:
-          if (req.equals("INVITE")) {
-            //generate toTag
-            if (gettag(cd.dst.to) == null) {
-              cd.dst.to = replacetag(cd.dst.to, generatetag());
-            }
-            //get o1/o2
-            cd.dst.o1 = geto(msg, 1) + 1;
-            cd.dst.o2 = geto(msg, 2) + 1;
-            cd.dst.sdp = getSDP(msg);
-            switch (iface.onInvite(this, callid, cd.dst.from[0], cd.dst.from[1], cd.dst.sdp)) {
-              case 180:  //this is the normal return
-                reply(cd, cmd, 180, "RINGING", false, false);
-                break;
-              case 200:  //this was usually a reINVITE to change sdp details
-                buildsdp(cd, cd.src);
-                reply(cd, cmd, 200, "OK", true, false);
-                break;
-              case 486:
-                reply(cd, cmd, 486, "BUSY HERE", false, false);
-                break;
-              case -1:
-                //do nothing
-                break;
-            }
-            break;
-          }
-          if (req.equals("CANCEL")) {
-            iface.onCancel(this, callid, 0);
-            reply(cd, cmd, 200, "OK", false, false);
-            reply(cd, "INVITE", 487, "CANCELLED", false, false);
-            //then should receive ACK
-//            setCallDetails(callid, null);  //need to wait for ACK
-            break;
-          }
-          if (req.equals("BYE")) {
-            reply(cd, cmd, 200, "OK", false, false);
-            iface.onBye(this, callid);
-//            setCallDetails(callid, null);  //need to wait for ACK
-            break;
-          }
-          if (req.equals("OPTIONS")) {
-            reply(cd, cmd, 405, "Method Not Allowed", false, false);
-            break;
-          }
-          if (req.equals("NOTIFY")) {
-            reply(cd, cmd, 200, "OK", false, false);
-            for (int a = 0; a < msg.length; a++) {
-              //look for double \r\n (which appears as an empty line) that marks end of SIP header
-              if (msg[a].length() == 0) {
-                //send the rest of packet as content of NOTIFY event
-                String content = "";
-                for (int b = a + 1; b < msg.length; b++) {
-                  content += msg[b];
-                  content += "\r\n";
-                }
-                String event = getHeader("Event:", msg);
-                if (event == null) event = getHeader("o:", msg);
-                iface.onNotify(this, callid, event, content);
-                break;
-              }
-            }
-            break;
-          }
-          if (req.equals("ACK")) {
-            SDP sdp = getSDP(msg);
-            if (cd.dst.sdp == null) {
-              cd.dst.sdp = sdp;
-            }
-            iface.onAck(this, callid, sdp);
-            if (cmd.equals("BYE")) {
-              setCallDetails(callid, null);
-            }
-            break;
+          try {
+            handleRequest(msg, req, callid, cd, cmd, previousTo);
+          } catch (SipFailureException e) {
+            reply(cd, cmd, e.getCode(), e.getReason(), false, false);
           }
           break;
         case 100:
@@ -880,20 +815,11 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
         case 180:
           iface.onRinging(this, callid);
           break;
-        case 181:
-          //call if being forwarded
-          //ignore for now
-          break;
         case 183:
         case 200:
           if (cmd.equals("REGISTER")) {
             if (type == 183) break;  //not used in REGISTER command
             if (cd.src.expires > 0) {
-              if (localhost_changed) {
-                JFLog.log("localhost change detected, reregister()ing");
-                reregister();
-                break;
-              }
               registered = true;
               iface.onRegister(this, true);
             } else {
@@ -902,12 +828,12 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
             }
           } else if (cmd.equals("INVITE")) {
             cd.dst.sdp = getSDP(msg);
+
             //update cd.src.to tag value
             cd.src.to = cd.dst.to;
-            cd.src.epass = null;
-            cd.src.routelist = cd.dst.routelist;  //RFC 2543 6.29
-            if (type == 200) issue(cd, "ACK", false, true);
+
             iface.onSuccess(this, callid, cd.dst.sdp, type == 200);
+            if (type == 200) issue(cd, "ACK", false, true);
           } else if (cmd.equals("BYE")) {
             if (type == 183) break;  //not used in BYE command
             //call leg ended
@@ -951,21 +877,21 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
         case 403:
           cd.src.epass = null;
           cd.src.cseq = cd.dst.cseq;
-          issue(cd, "ACK", false, true);
           if (cmd.equals("REGISTER")) {
             //bad password
             iface.onRegister(this, false);
           } else {
             iface.onCancel(this, callid, type);
           }
+          issue(cd, "ACK", false, true);
           break;
         case 404:  //no one there
         case 486:  //busy
           if (cd.dst.to != null) cd.src.to = cd.dst.to;
           cd.src.epass = null;
           cd.src.cseq = cd.dst.cseq;
-          issue(cd, "ACK", false, true);
           iface.onCancel(this, callid, type);
+          issue(cd, "ACK", false, true);
           setCallDetails(callid, null);
           break;
         default:
@@ -973,13 +899,90 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
           if (cd.dst.to != null) cd.src.to = cd.dst.to;
           cd.src.epass = null;
           cd.src.cseq = cd.dst.cseq;
-          issue(cd, "ACK", false, true);
           iface.onCancel(this, callid, type);
+          issue(cd, "ACK", false, true);
 //          setCallDetails(callid, null);  //might not be done
           break;
       }
     } catch (Exception e) {
       JFLog.log(e);
+    }
+  }
+
+  private void handleRequest(String[] msg, String req, String callid, CallDetails cd, String cmd, String[] previousTo) {
+    if (req.equals("INVITE")) {
+      //generate toTag
+      if (gettag(cd.dst.to) == null) {
+        String previousTag = gettag(previousTo);
+        cd.dst.to = replacetag(cd.dst.to, previousTag == null ? generatetag() : previousTag);
+      }
+
+      if (cd.dst.to[1] != null && !user.equals(cd.dst.to[1])) {
+        throw new SipFailureException(404, "Not Found");
+      }
+
+      //get o1/o2
+      cd.dst.o1 = geto(msg, 1) + 1;
+      cd.dst.o2 = geto(msg, 2) + 1;
+      cd.dst.sdp = getSDP(msg);
+      switch (iface.onInvite(this, callid, cd.dst.from[0], cd.dst.from[1], cd.dst.sdp)) {
+        case 180:  //this is the normal return
+          reply(cd, cmd, 180, "RINGING", false, false);
+          break;
+        case 200:  //this was usually a reINVITE to change sdp details
+          buildsdp(cd, cd.src);
+          reply(cd, cmd, 200, "OK", true, false);
+          break;
+        case 486:
+          reply(cd, cmd, 486, "BUSY HERE", false, false);
+          break;
+        case -1:
+          //do nothing
+          break;
+      }
+    }
+    if (req.equals("CANCEL")) {
+      iface.onCancel(this, callid, 0);
+      reply(cd, cmd, 200, "OK", false, false);
+      reply(cd, "INVITE", 487, "CANCELLED", false, false);
+      //then should receive ACK
+      //            setCallDetails(callid, null);  //need to wait for ACK
+    }
+    if (req.equals("BYE")) {
+      iface.onBye(this, callid);
+      reply(cd, cmd, 200, "OK", false, false);
+      //            setCallDetails(callid, null);  //need to wait for ACK
+    }
+    if (req.equals("OPTIONS")) {
+      reply(cd, cmd, 200, "OK", false, false);
+    }
+    if (req.equals("NOTIFY")) {
+      reply(cd, cmd, 200, "OK", false, false);
+      for (int a = 0; a < msg.length; a++) {
+        //look for double \r\n (which appears as an empty line) that marks end of SIP header
+        if (msg[a].length() == 0) {
+          //send the rest of packet as content of NOTIFY event
+          String content = "";
+          for (int b = a + 1; b < msg.length; b++) {
+            content += msg[b];
+            content += "\r\n";
+          }
+          String event = getHeader("Event:", msg);
+          if (event == null) event = getHeader("o:", msg);
+          iface.onNotify(this, callid, event, content);
+          break;
+        }
+      }
+    }
+    if (req.equals("ACK")) {
+      SDP sdp = getSDP(msg);
+      if (cd.dst.sdp == null) {
+        cd.dst.sdp = sdp;
+      }
+      iface.onAck(this, callid, sdp);
+      if (cmd.equals("BYE")) {
+        setCallDetails(callid, null);
+      }
     }
   }
 

@@ -1,10 +1,17 @@
 package javaforce.voip;
 
-import java.util.*;
-import java.net.*;
+import javaforce.BE;
+import javaforce.JFLog;
+import javaforce.media.AudioBuffer;
+import javaforce.media.AudioBufferFactory;
+import javaforce.media.DefaultAudioBufferFactory;
 
-import javaforce.*;
-import javaforce.media.*;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Random;
+
+import static java.util.Arrays.asList;
 
 public class RTPChannel {
 
@@ -23,7 +30,8 @@ public class RTPChannel {
   private int h263_2000_id = -1;
   private char dtmfChar;
   private boolean dtmfSent = false;
-  private AudioBuffer buffer = new AudioBuffer(8000, 1, 2);  //freq, chs, seconds
+  private AudioBuffer buffer;
+  private AudioBufferFactory audioBufferFactory;
   private DTMF dtmf;
   private static short silence8[] = new short[160];
   private static short silence16[] = new short[320];
@@ -37,10 +45,15 @@ public class RTPChannel {
   public Coder coder_g711u, coder_g711a, coder_g722, coder_g729a;
   public Coder coder;  //selected audio encoder
 
-  protected RTPChannel(RTP rtp, int ssrc, SDP.Stream stream) {
+  protected RTPChannel(RTP rtp, int ssrc, SDP.Stream stream, AudioBufferFactory audioBufferFactory) {
     this.rtp = rtp;
     this.ssrc_src = ssrc;
     this.stream = stream;
+    this.audioBufferFactory = audioBufferFactory;
+  }
+
+  protected RTPChannel(RTP rtp, int ssrc, SDP.Stream stream) {
+    this(rtp, ssrc, stream, new DefaultAudioBufferFactory());
   }
 
   public int getVP8id() {
@@ -268,6 +281,7 @@ public class RTPChannel {
         if (coder == null) {
           JFLog.log("RTP.start() : Warning : no compatible audio codec selected");
         }
+        buffer = audioBufferFactory.create(coder.getSampleRate());
         dtmf = new DTMF(coder.getSampleRate());
       } else {
         boolean haveVcodec = false;
@@ -326,19 +340,12 @@ public class RTPChannel {
   /**
    * Changes the SDP.Stream for this RTP session. Could occur in a SIP reINVITE.
    */
-  public boolean change(SDP.Stream new_stream) {
+  public boolean change(SDP.Stream new_stream, Codec codec) {
     lastPacket = System.currentTimeMillis();
     stream = new_stream;
     if (stream.type == SDP.Type.audio) {
-      if (new_stream.hasCodec(RTP.CODEC_G711u)) {
-        coder = coder_g711u;
-      } else if (new_stream.hasCodec(RTP.CODEC_G711a)) {
-        coder = coder_g711a;
-      } else if (new_stream.hasCodec(RTP.CODEC_G722)) {
-        coder = coder_g722;
-      } else if (new_stream.hasCodec(RTP.CODEC_G729a)) {
-        coder = coder_g729a;
-      }
+      coder = getAudioCoder(codec);
+      buffer = audioBufferFactory.create(coder.getSampleRate());
       dtmf = new DTMF(coder.getSampleRate());
     }
     if (rtp.useTURN) {
@@ -351,6 +358,39 @@ public class RTPChannel {
     return true;
   }
 
+  private Codec getCodecForStream(SDP.Stream new_stream, List<Codec> enabledCodecs) {
+    for (Codec enabledCodec : enabledCodecs) {
+      if (new_stream.hasCodec(enabledCodec)) {
+        return enabledCodec;
+      }
+    }
+    return null;
+  }
+
+  private Coder getAudioCoder(Codec codec) {
+    if (RTP.CODEC_G711u.equals(codec)) {
+      return  coder_g711u;
+
+    } else if (RTP.CODEC_G711a.equals(codec)) {
+      return coder_g711a;
+
+    } else if (RTP.CODEC_G722.equals(codec)) {
+      return coder_g722;
+
+    } else if (RTP.CODEC_G729a.equals(codec)) {
+      return coder_g729a;
+    }
+    throw new IllegalArgumentException("unknown codec " + codec);
+  }
+
+  /**
+   * Changes the SDP.Stream for this RTP session. Could occur in a SIP reINVITE.
+   */
+  public boolean change(SDP.Stream new_stream) {
+    Codec codec = getCodecForStream(new_stream, asList(RTP.CODEC_G711u, RTP.CODEC_G711a, RTP.CODEC_G722, RTP.CODEC_G729a));
+    return change(new_stream, codec);
+  }
+
   protected void processRTP(byte data[], int off, int len) {
     lastPacket = RTP.now;
     if (rtp.rawMode) {
@@ -358,6 +398,7 @@ public class RTPChannel {
       return;
     }
     int id = data[off + 1] & 0x7f;  //payload id
+    int seqnum = getseqnum(data, off);
     if (id < 96) {
       switch (id) {
         case 0:
@@ -366,7 +407,7 @@ public class RTPChannel {
             JFLog.log("RTP:Bad g711u length");
             break;
           }
-          addSamples(coder_g711u.decode(data, off));
+          addSamples(seqnum, coder_g711u.decode(data, off));
           rtp.iface.rtpSamples(this);
           break;
         case 8:
@@ -375,7 +416,7 @@ public class RTPChannel {
             JFLog.log("RTP:Bad g711a length");
             break;
           }
-          addSamples(coder_g711a.decode(data, off));
+          addSamples(seqnum, coder_g711a.decode(data, off));
           rtp.iface.rtpSamples(this);
           break;
         case 9:
@@ -384,7 +425,7 @@ public class RTPChannel {
             JFLog.log("RTP:Bad g722 length");
             break;
           }
-          addSamples(coder_g722.decode(data, off));
+          addSamples(seqnum, coder_g722.decode(data, off));
           rtp.iface.rtpSamples(this);
           break;
         case 18:
@@ -393,7 +434,7 @@ public class RTPChannel {
             JFLog.log("RTP:Bad g729a length");
             break;
           }
-          addSamples(coder_g729a.decode(data, off));
+          addSamples(seqnum, coder_g729a.decode(data, off));
           rtp.iface.rtpSamples(this);
           break;
         case 26:
@@ -421,11 +462,11 @@ public class RTPChannel {
         }
         if (dtmfChar == ' ') {
           switch (coder.getSampleRate()) {
-            case 8000: addSamples(silence8); break;
-            case 16000: addSamples(silence16); break;
+            case 8000: addSamples(seqnum, silence8); break;
+            case 16000: addSamples(seqnum, silence16); break;
           }
         } else {
-          addSamples(dtmf.getSamples(dtmfChar));
+          addSamples(seqnum, dtmf.getSamples(dtmfChar));
           if (!dtmfSent) {
             rtp.iface.rtpDigit(this, dtmfChar);
             dtmfSent = true;
@@ -472,11 +513,11 @@ public class RTPChannel {
     if (!stream.canRecv()) {
       return moh.getSamples(data);
     }
-    return buffer.get(data, 0, data.length);
+    return buffer.get(data);
   }
 
-  private void addSamples(short data[]) {
-    buffer.add(data, 0, data.length);
+  private void addSamples(int seqnum, short data[]) {
+    buffer.add(seqnum, data);
   }
 
   public String toString() {

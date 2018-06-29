@@ -85,6 +85,7 @@ public abstract class SIP {
    * Sends a packet out on the UDP port.
    */
   protected boolean send(InetAddress remote, int remoteport, String datastr) {
+    JFLog.log(String.format("%nSent to: %s:%d%n>----->%n%s%n------", remote.toString(), remoteport, datastr));
     byte data[] = datastr.getBytes();
     return transport.send(data, 0, data.length, remote, remoteport);
   }
@@ -182,7 +183,7 @@ public abstract class SIP {
     if (x == null) {
       return "\"null\"<sip:null@null>";
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if (x[0].length() > 0) {
       buf.append('\"');
       buf.append(x[0]);

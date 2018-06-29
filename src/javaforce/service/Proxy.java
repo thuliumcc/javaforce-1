@@ -56,7 +56,7 @@ public class Proxy extends Thread {
   private int port = 3128;
 
   public void close() {
-    JFLog.logTrace("proxy.close()");
+    JFLog.log("proxy.close()");
     try {
       ss.close();
     } catch (Exception e) {}
