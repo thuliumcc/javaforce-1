@@ -707,7 +707,7 @@ public class SIPClient extends SIP implements SIPInterface, STUN.Listener {
    */
   public void packet(String msg[], String remoteip, int remoteport) {
     try {
-      JFLog.log(String.format("%nReceived from: %s:%d%n<-----<%n%s%n------", remoteip, remoteport, Arrays.stream(msg).collect(Collectors.joining("\r\n"))));
+      JFLog.trace(String.format("%nReceived from: %s:%d%n<-----<%n%s%n------", remoteip, remoteport, Arrays.stream(msg).collect(Collectors.joining("\r\n"))));
       if (!remoteip.equals(this.remoteip) || remoteport != this.remoteport) {
         JFLog.log("Ignoring packet from unknown host:" + remoteip + ":" + remoteport);
         return;
