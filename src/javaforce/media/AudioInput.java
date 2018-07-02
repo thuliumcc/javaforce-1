@@ -62,7 +62,9 @@ public class AudioInput {
       return false;
     }
     try {
-      tdl.open(af);
+      JFLog.log("Buffer size before: " + tdl.getBufferSize());
+      tdl.open(af, 3 * bufsiz);
+      JFLog.log("Buffer size after: " + tdl.getBufferSize());
     } catch (Exception e) {
       JFLog.log(e);
       return false;
