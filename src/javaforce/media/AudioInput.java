@@ -98,7 +98,10 @@ public class AudioInput {
   }
 
   public void flushOnly() {
-    tdl.flush();
+    if (tdl != null) {
+      JFLog.log("Flushing audio buffer");
+      tdl.flush();
+    }
   }
 
   public boolean stop() {
