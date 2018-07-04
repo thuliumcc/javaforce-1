@@ -97,6 +97,10 @@ public class AudioInput {
     tdl.flush();
   }
 
+  public void flushOnly() {
+    tdl.flush();
+  }
+
   public boolean stop() {
     if (tdl == null) {
       return false;
