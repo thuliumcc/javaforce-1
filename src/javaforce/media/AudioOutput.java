@@ -103,6 +103,10 @@ public class AudioOutput {
     sdl.flush();
   }
 
+  public void flushOnly() {
+    sdl.flush();
+  }
+
   public boolean stop() {
     if (sdl == null) {
       return false;
