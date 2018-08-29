@@ -31,6 +31,7 @@ public abstract class SIP {
   private String tupleid;
   private Random r = new Random();
   private boolean server;
+  private int port;
   protected SIPTransport transport;
   protected static String useragent = "JavaForce/" + JF.getVersion();
 
@@ -39,6 +40,7 @@ public abstract class SIP {
    */
   protected boolean init(int port, SIPInterface iface, boolean server, Transport type) throws Exception {
     rinstance = null;
+    this.port = port;
     this.iface = iface;
     this.server = server;
     switch (type) {
@@ -85,7 +87,7 @@ public abstract class SIP {
    * Sends a packet out on the UDP port.
    */
   protected boolean send(InetAddress remote, int remoteport, String datastr) {
-    JFLog.trace(String.format("%nSent to: %s:%d%n>----->%n%s%n------", remote.toString(), remoteport, datastr));
+    JFLog.trace(String.format("%nSent to: %s:%d from port: %d%n>----->%n%s%n------", remote.toString(), remoteport, port, datastr));
     byte data[] = datastr.getBytes();
     return transport.send(data, 0, data.length, remote, remoteport);
   }
