@@ -37,6 +37,7 @@ public class AudioInput {
   }
 
   public boolean start(int chs, int freq, int bits, int bufsiz, String device) {
+    JFLog.log("Input start");
     buf8 = new byte[bufsiz];
     if (device == null) {
       device = "<default>";
@@ -70,6 +71,7 @@ public class AudioInput {
       return false;
     }
     tdl.start();
+    JFLog.log("Input started: " + tdl);
     return true;
   }
 
@@ -93,18 +95,21 @@ public class AudioInput {
   }
   
   public void flush() {
+    JFLog.log("Input flush");
     tdl.drain();
     tdl.flush();
   }
 
   public void flushOnly() {
+    JFLog.log("Flush only: " + tdl);
     if (tdl != null) {
-      JFLog.log("Flushing audio buffer");
+      JFLog.log("Flushing input audio buffer");
       tdl.flush();
     }
   }
 
   public boolean stop() {
+    JFLog.log("Input stop");
     if (tdl == null) {
       return false;
     }

@@ -104,7 +104,11 @@ public class AudioOutput {
   }
 
   public void flushOnly() {
-    sdl.flush();
+    JFLog.log("Flush only: " + sdl);
+    if (sdl != null) {
+      JFLog.log("Flushing output audio buffer");
+      sdl.flush();
+    }
   }
 
   public boolean stop() {
