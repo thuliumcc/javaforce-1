@@ -44,10 +44,14 @@ public class AudioInput {
     }
     af = new AudioFormat((float) freq, bits, chs, true, true);
     JFLog.log("AudioInput:AudioFormat=" + af);
+    JFLog.log("AudioInput:Device=" + device);
     Mixer.Info[] mi = AudioSystem.getMixerInfo();
     int idx = -1;
     for (int a = 0; a < mi.length; a++) {
-      if (mi[a].getName().equalsIgnoreCase(device)) {
+      JFLog.log("AudioInput:Device to compare=" + mi[a].getName());
+      String deviceToCompare = fixAudioDeviceName(mi[a].getName());
+      if (deviceToCompare.equalsIgnoreCase(device)) {
+        JFLog.log("AudioInput:Device is matching");
         idx = a;
         break;
       }
@@ -73,6 +77,10 @@ public class AudioInput {
     tdl.start();
     JFLog.log("Input started: " + tdl);
     return true;
+  }
+
+  private String fixAudioDeviceName(String device) {
+    return device == null ? "" : device.replaceAll("[^a-zA-Z0-9<> ]+", "_");
   }
 
   public boolean read(byte[] buf) {

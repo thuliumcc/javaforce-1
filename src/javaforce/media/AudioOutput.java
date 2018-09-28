@@ -1,5 +1,7 @@
 package javaforce.media;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import javaforce.BE;
 import javaforce.JFLog;
@@ -40,12 +42,17 @@ public class AudioOutput {
     if (device == null) {
       device = "<default>";
     }
+    device = fixAudioDeviceName(device);
     af = new AudioFormat((float) freq, bits, chs, true, true);
     JFLog.log("AudioOutput:AudioFormat=" + af);
+    JFLog.log("AudioOutput:Device=" + device);
     Mixer.Info[] mi = AudioSystem.getMixerInfo();
     int idx = -1;
     for (int a = 0; a < mi.length; a++) {
-      if (mi[a].getName().equalsIgnoreCase(device)) {
+      JFLog.log("AudioOutput:Device to compare=" + mi[a].getName());
+      String deviceToCompare = fixAudioDeviceName(mi[a].getName());
+      if (deviceToCompare.equalsIgnoreCase(device)) {
+        JFLog.log("AudioOutput:Device is matching");
         idx = a;
         break;
       }
@@ -86,6 +93,10 @@ public class AudioOutput {
     }
     sdl.start();
     return true;
+  }
+
+  private String fixAudioDeviceName(String device) {
+    return device == null ? "" : device.replaceAll("[^a-zA-Z0-9<> ]+", "_");
   }
 
   public boolean write(byte[] buf) {
