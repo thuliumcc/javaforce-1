@@ -42,7 +42,7 @@ public class AudioOutput {
     if (device == null) {
       device = "<default>";
     }
-    device = fixAudioDeviceName(device);
+    device = AudioDeviceNameUtil.fixAudioDeviceName(device);
     af = new AudioFormat((float) freq, bits, chs, true, true);
     JFLog.log("AudioOutput:AudioFormat=" + af);
     JFLog.log("AudioOutput:Device=" + device);
@@ -50,7 +50,7 @@ public class AudioOutput {
     int idx = -1;
     for (int a = 0; a < mi.length; a++) {
       JFLog.log("AudioOutput:Device to compare=" + mi[a].getName());
-      String deviceToCompare = fixAudioDeviceName(mi[a].getName());
+      String deviceToCompare = AudioDeviceNameUtil.fixAudioDeviceName(mi[a].getName());
       if (deviceToCompare.equalsIgnoreCase(device)) {
         JFLog.log("AudioOutput:Device is matching");
         idx = a;
@@ -93,10 +93,6 @@ public class AudioOutput {
     }
     sdl.start();
     return true;
-  }
-
-  private String fixAudioDeviceName(String device) {
-    return device == null ? "" : device.replaceAll("[^a-zA-Z0-9<> ]+", "_");
   }
 
   public boolean write(byte[] buf) {
